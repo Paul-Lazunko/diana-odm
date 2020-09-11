@@ -76,10 +76,15 @@ export class Connection {
 
   private onData(data: string): void {
     let response: any;
+    let dataString: string = data.toString();
+    if ( dataString.match('\n') ) {
+      dataString = dataString.replace('\n', '');
+    }
     try {
-      const decryptedData: string = this.rawDataString.length ? CryptoHelper.decrypt(this.options.secureKey, this.rawDataString + data.toString()) : CryptoHelper.decrypt(this.options.secureKey, data.toString());
+      const decryptedData: string = this.rawDataString.length ? CryptoHelper.decrypt(this.options.secureKey, this.rawDataString + dataString) : CryptoHelper.decrypt(this.options.secureKey, dataString);
       response = JSON.parse(decryptedData);
       const { requestId, action } = response;
+      this.rawDataString = '';
       if ( action === EServerActions.RESPONSE ) {
         const hasError: boolean = response.hasOwnProperty('error');
         if ( hasError ) {
@@ -89,7 +94,6 @@ export class Connection {
         }
         clearTimeout(this.timeouts.get(requestId));
         this.timeouts.delete(requestId);
-        this.rawDataString = '';
       } else if (action === EServerActions.PUBLISH) {
         if ( this.subscriber instanceof Subscriber) {
           this.subscriber.process(response.data as ISubscriberHandlerParams);
