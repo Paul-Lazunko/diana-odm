@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { Socket } from 'net';
-import { EServerActions } from '../constants';
+import { EClientActions, EServerActions } from '../constants';
 import { CryptoHelper } from '../helpers';
 import { IClientOptions } from '../options';
 import { ISubscriberHandlerParams } from '../params';
@@ -90,7 +90,7 @@ export class Connection {
         if ( hasError ) {
           this.eventEmitter.emit(`error-${requestId}`, response.error);
         } else {
-          this.eventEmitter.emit(`response-${requestId}`, response.data);
+          this.eventEmitter.emit(`response-${requestId}`, response);
         }
         clearTimeout(this.timeouts.get(requestId));
         this.timeouts.delete(requestId);
@@ -104,17 +104,28 @@ export class Connection {
     }
   }
 
-  public handleRequest(request: IRequest): Promise<IResponse> {
-    const { requestId } = request;
+  public handleRequest(request: IRequest): Promise<Partial<IResponse>> {
+    const { requestId, action } = request;
     return new Promise((resolve, reject) => {
       this.timeouts.set(requestId, setTimeout(() => {
         reject(new Error(`000 - Request failed by timeout ${this.options.requestTimeout} ms`));
         this.eventEmitter.removeAllListeners(`response-${requestId}`);
       }, this.options.requestTimeout));
-      this.eventEmitter.addListener(`response-${requestId}`, (data: any) => {
+      this.eventEmitter.addListener(`response-${requestId}`, (response: IResponse) => {
         this.eventEmitter.removeAllListeners(`response-${requestId}`);
         this.eventEmitter.removeAllListeners(`error-${requestId}`);
-        return resolve(data);
+        const { data, nFound, nModified, nRemoved } = response;
+        switch (action) {
+          case EClientActions.UPDATE:
+            return resolve({ nFound, nModified });
+            break;
+          case EClientActions.REMOVE:
+            return resolve({ nFound, nRemoved });
+            break;
+          default:
+            return resolve(data);
+            break;
+        }
       });
       this.eventEmitter.addListener(`error-${requestId}`, (error: string) => {
         this.eventEmitter.removeAllListeners(`response-${requestId}`);
