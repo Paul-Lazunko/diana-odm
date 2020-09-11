@@ -14,14 +14,14 @@ export class Connection {
   private options: IClientOptions;
   private isStarted: boolean;
   private timeouts: Map<string, NodeJS.Timer>;
-  private bigString: string;
+  private rawDataString: string;
   private reconnectTimeout: any;
   public transactionId: string;
   protected subscriber: Subscriber;
 
   constructor(options: IClientOptions) {
     this.options = options;
-    this.bigString = '';
+    this.rawDataString = '';
     this.timeouts = new Map<string, any>();
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.addListener('reconnect', () => {
@@ -77,7 +77,7 @@ export class Connection {
   private onData(data: string): void {
     let response: any;
     try {
-      const decryptedData: string = this.bigString.length ? CryptoHelper.decrypt(this.options.secureKey, this.bigString + data.toString()) : CryptoHelper.decrypt(this.options.secureKey, data.toString());
+      const decryptedData: string = this.rawDataString.length ? CryptoHelper.decrypt(this.options.secureKey, this.rawDataString + data.toString()) : CryptoHelper.decrypt(this.options.secureKey, data.toString());
       response = JSON.parse(decryptedData);
       const { requestId, action } = response;
       if ( action === EServerActions.RESPONSE ) {
@@ -89,14 +89,14 @@ export class Connection {
         }
         clearTimeout(this.timeouts.get(requestId));
         this.timeouts.delete(requestId);
-        this.bigString = '';
+        this.rawDataString = '';
       } else if (action === EServerActions.PUBLISH) {
         if ( this.subscriber instanceof Subscriber) {
           this.subscriber.process(response.data as ISubscriberHandlerParams);
         }
       }
     } catch(e) {
-      this.bigString += data.toString();
+      this.rawDataString += data.toString();
     }
   }
 

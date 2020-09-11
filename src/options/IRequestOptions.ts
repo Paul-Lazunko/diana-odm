@@ -8,9 +8,9 @@ export interface IRequestOptions {
   collection: string,
   action: EClientActions,
   requestId: string
-  filterQueries?: IQuery[],
+  filterQueries?: IQuery | IQuery[],
   transformQueries?: any[],
-  updateQuery?: any,
+  setData?: any,
   sortQuery?: any,
   skip?: number,
   limit?: number,

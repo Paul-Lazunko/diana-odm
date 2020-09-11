@@ -1,6 +1,6 @@
-import {TBooleanQuery} from './TBooleanQuery';
-import {TStringQuery} from './TStringQuery';
-import {TNumberQuery} from './TNumberQuery';
-import {ITimeQuery} from '../structures';
+import { TBooleanQuery } from './TBooleanQuery';
+import { TStringQuery } from './TStringQuery';
+import { TNumberQuery } from './TNumberQuery';
+import { IGeoQuery, ITimeQuery } from '../structures';
 
-export type TQuery = TBooleanQuery | TStringQuery | TNumberQuery | ITimeQuery;
+export type TQuery = TBooleanQuery | TStringQuery | TNumberQuery | ITimeQuery | IGeoQuery;

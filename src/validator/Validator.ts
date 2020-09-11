@@ -1,11 +1,11 @@
 import { Types } from '../constants';
 import { ErrorFactory } from "../factory";
 import { IValidatorOptions } from '../options';
-import { ISchema } from '../structures';
+import { IQuery, ISchema } from '../structures';
 import {
   filterQueryValidator,
   transformQueriesValidator,
-  updateQueryValidator,
+  setDataValidator,
   sortQueryValidator,
   schemaItemValidator
 } from './validationHelpers';
@@ -29,10 +29,10 @@ export class Validator {
     }
   }
 
-  public filterQueries(filterQueries: any[]) {
+  public filterQueries(filterQueries: any | any[]) {
     let validationResult: any;
     for ( let i =0; i < filterQueries.length; i = i + 1) {
-      const filterQuery: any = filterQueries[i];
+      const filterQuery: IQuery = filterQueries[i];
       for ( const key in filterQuery ) {
         if ( ! this.schema[key] ) {
           throw ErrorFactory.collectionError(`property '${key}' doesn't exist in the '${this.collection}' collection's Schema`)
@@ -116,44 +116,44 @@ export class Validator {
           case Types.ARRAY:
             switch(this.schema[key].items) {
               case Types.BOOLEAN:
-                validationResult = updateQueryValidator.arrayOfBoolean(data[key])
+                validationResult = setDataValidator.arrayOfBoolean(data[key])
                 break;
               case Types.STRING:
-                validationResult = updateQueryValidator.arrayOfString(data[key])
+                validationResult = setDataValidator.arrayOfString(data[key])
                 break;
               case Types.REFERENCE:
               case Types.OBJECT_ID:
-                validationResult = updateQueryValidator.arrayOfObjectId(data[key])
+                validationResult = setDataValidator.arrayOfObjectId(data[key])
                 break;
               case Types.NUMBER:
-                validationResult = updateQueryValidator.arrayOfNumber(data[key])
+                validationResult = setDataValidator.arrayOfNumber(data[key])
                 break;
               case Types.TIME:
-                validationResult = updateQueryValidator.arrayOfTime(data[key])
+                validationResult = setDataValidator.arrayOfTime(data[key])
                 break;
               case Types.GEO:
-                validationResult = updateQueryValidator.geo(data[key])
+                validationResult = setDataValidator.geo(data[key])
                 break;
             }
             break;
           case Types.BOOLEAN:
-            validationResult = updateQueryValidator.boolean(data[key])
+            validationResult = setDataValidator.boolean(data[key])
             break;
           case Types.STRING:
-            validationResult = updateQueryValidator.string(data[key]);
+            validationResult = setDataValidator.string(data[key]);
             break;
           case Types.REFERENCE:
           case Types.OBJECT_ID:
-            validationResult = updateQueryValidator.objectId(data[key]);
+            validationResult = setDataValidator.objectId(data[key]);
             break;
           case Types.NUMBER:
-            validationResult = updateQueryValidator.number(data[key])
+            validationResult = setDataValidator.number(data[key])
             break;
           case Types.TIME:
-            validationResult = updateQueryValidator.time(data[key])
+            validationResult = setDataValidator.time(data[key])
             break;
           case Types.GEO:
-            validationResult = updateQueryValidator.geo(data[key])
+            validationResult = setDataValidator.geo(data[key])
             break;
         }
       }

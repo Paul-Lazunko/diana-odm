@@ -13,7 +13,7 @@ import {
   validateSubscriberOptions
 } from "../validator";
 
-export class DiODM {
+export class DianaODM {
 
   protected connection: Connection;
   protected models: Map<string, IModel>;

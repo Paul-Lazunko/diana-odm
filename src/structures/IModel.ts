@@ -1,19 +1,21 @@
-import { IResponse } from './IResponse';
+import { IQuery } from "./IQuery";
+import { ISetData } from "./ISetData";
 import { ISortQuery } from './ISortQuery';
+import { ITransformQuery } from "./ITransformQuery";
 
 export interface IModel {
 
-  insert: (data: any) => Promise<IResponse>
+  insert: (data: ISetData) => Promise<any>
   find: (
-    filterQueries: any | any[],
-    transformQueries?:any[],
+    filterQueries: IQuery | IQuery[],
+    transformQueries?:ITransformQuery[],
     sortQuery?: ISortQuery,
     skip?: number,
     limit?:number
-  ) => Promise<IResponse>
-  count: (filterQueries: any | any[], transformQueries?:any[]) => Promise<IResponse>
-  update: (filterQueries: any | any[], updateData: any) => Promise<IResponse>
-  remove: (filterQueries: any | any[])  => Promise<IResponse>,
+  ) => Promise<any[]>
+  count: (filterQueries: IQuery | IQuery[], transformQueries?:any[]) => Promise<any>
+  update: (filterQueries: IQuery | IQuery[], updateData: ISetData) => Promise<any>
+  remove: (filterQueries: IQuery | IQuery[])  => Promise<any>,
   init: () => Promise<void>
 
 }

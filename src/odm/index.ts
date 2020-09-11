@@ -1,1 +1,1 @@
-export * from './DiODM'
+export * from './DianaODM'

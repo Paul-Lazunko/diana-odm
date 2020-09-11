@@ -1,8 +1,7 @@
-import { Connection } from '../connection';
 import { EClientActions } from '../constants';
 import { compareSchemas } from '../helpers';
 import { IModelOptions, IRequestOptions } from '../options';
-import { IResponse, ISchema, ISortQuery, IModel } from '../structures';
+import { IResponse, ISchema, ISortQuery, IModel, IQuery, ISetData, ITransformQuery } from '../structures';
 import { Request } from '../request';
 import { Validator } from '../validator';
 
@@ -48,7 +47,7 @@ export class Model implements IModel {
     return collections.includes(this.options.collection);
   }
 
-  protected async createCollection() {
+  protected async createCollection(): Promise<any> {
     const options: Partial<IRequestOptions> = this.getBaseOptions();
     options.action = EClientActions.ADD_COLLECTION;
     options.schema = this.getConvertedSchema();
@@ -79,7 +78,7 @@ export class Model implements IModel {
    return compareSchemas(schema, schema)
   }
 
-  protected updateSchema() {
+  protected updateSchema(): Promise<any> {
     const options: Partial<IRequestOptions> = this.getBaseOptions();
     options.action = EClientActions.UPDATE_COLLECTION;
     options.schema = this.getConvertedSchema();
@@ -98,11 +97,11 @@ export class Model implements IModel {
     return options;
   }
 
-  protected request(options: Partial<IRequestOptions>): Promise<any> {
+  protected request(options: Partial<IRequestOptions>): Promise<any|any[]> {
     return new Request(options).execute();
   }
 
-  public insert(data: any): Promise<IResponse> {
+  public insert(data: ISetData): Promise<IResponse> {
     for ( const key in this.options.schema ) {
       if ( this.options.schema[key]?.default  ) {
         if ( typeof this.options.schema[key].default === 'function' ) {
@@ -115,16 +114,16 @@ export class Model implements IModel {
     this.validate.requiredFields(data);
     this.validate.data(data);
     const options: Partial<IRequestOptions> = this.getBaseOptions();
-    options.updateQuery = data;
+    options.setData = data;
     options.action = EClientActions.INSERT;
     return this.request(options);
   }
 
-  protected convertFilterQueries(filterQueries: any[]): any[] {
+  protected convertFilterQueries(filterQueries: IQuery | IQuery[]): IQuery[] {
     if ( !Array.isArray(filterQueries) ) {
-      filterQueries = [filterQueries];
+      filterQueries = [ filterQueries ];
     }
-    return filterQueries.map((item: any) => {
+    return filterQueries.map((item: IQuery) => {
       for ( const key in item ) {
         if ( Array.isArray(item[key]) ) {
           item[key] = { $in: item[key] };
@@ -136,7 +135,7 @@ export class Model implements IModel {
     });
   }
 
-  public find(filterQueries: any[] = [{}], transformQueries?:any[], sortQuery?: ISortQuery, skip?: number, limit?:number) {
+  public find(filterQueries: IQuery | IQuery[] = [{}], transformQueries?:ITransformQuery[], sortQuery?: ISortQuery, skip?: number, limit?:number): Promise<any[]> {
     filterQueries = this.convertFilterQueries(filterQueries);
     this.validate.filterQueries(filterQueries);
     const options: Partial<IRequestOptions> = this.getBaseOptions();
@@ -161,7 +160,7 @@ export class Model implements IModel {
     return this.request(options);
   }
 
-  public count(filterQueries: any[] = [{}], transformQueries?:any[]) {
+  public count(filterQueries:  IQuery | IQuery[] = [{}], transformQueries?:any[]) {
     const options: Partial<IRequestOptions> = this.getBaseOptions();
     filterQueries = this.convertFilterQueries(filterQueries);
     this.validate.filterQueries(filterQueries);
@@ -174,19 +173,19 @@ export class Model implements IModel {
     return this.request(options);
   }
 
-  public update(filterQueries: any[] = [{}], updateData: any) {
+  public update(filterQueries:  IQuery | IQuery[] = [{}], updateData: ISetData): Promise<any> {
     const options: Partial<IRequestOptions> = this.getBaseOptions();
     filterQueries = this.convertFilterQueries(filterQueries);
     this.validate.filterQueries(filterQueries);
     this.validate.mutableFields(updateData);
     this.validate.data(updateData);
     options.filterQueries = filterQueries;
-    options.updateQuery = updateData;
+    options.setData = updateData;
     options.action = EClientActions.UPDATE;
     return this.request(options);
   }
 
-  public remove(filterQueries: any[] = [{}]) {
+  public remove(filterQueries:  IQuery | IQuery[] = [{}]): Promise<any> {
     const options: Partial<IRequestOptions> = this.getBaseOptions();
     filterQueries = this.convertFilterQueries(filterQueries);
     this.validate.filterQueries(filterQueries);

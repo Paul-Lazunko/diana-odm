@@ -9,7 +9,7 @@ export interface IRequest {
   requestId: string,
   filterQuery?: IQuery[],
   aggregationQuery?: any[],
-  updateQuery?: any,
+  setData?: any,
   sortQuery?: any,
   skip?: number,
   limit?: number,

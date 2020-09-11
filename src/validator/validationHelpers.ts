@@ -52,7 +52,7 @@ const filterQueryValidator: any = {
   }
 };
 
-const updateQueryValidator: any = {
+const setDataValidator: any = {
   boolean(data:any) {
     return booleanField.validate(data, defaultValidationOptions)
   },
@@ -139,7 +139,7 @@ export {
   schemaItemValidator,
   transformQueriesValidator,
   filterQueryValidator,
-  updateQueryValidator,
+  setDataValidator,
   sortQueryValidator,
   validateClientOptions,
   validateModelOptions,
