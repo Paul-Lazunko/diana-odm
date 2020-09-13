@@ -56,7 +56,7 @@ export class Validator {
               case Types.TIME:
                 validationResult = filterQueryValidator.time(filterQuery[key])
                 break;
-              case Types.GEO:
+              case Types.POSITION:
                 validationResult = filterQueryValidator.geo(filterQuery[key])
                 break;
             }
@@ -77,7 +77,7 @@ export class Validator {
           case Types.TIME:
             validationResult = filterQueryValidator.time(filterQuery[key])
             break;
-          case Types.GEO:
+          case Types.POSITION:
             validationResult = filterQueryValidator.geo(filterQuery[key])
             break;
         }
@@ -131,7 +131,7 @@ export class Validator {
               case Types.TIME:
                 validationResult = setDataValidator.arrayOfTime(data[key])
                 break;
-              case Types.GEO:
+              case Types.POSITION:
                 validationResult = setDataValidator.geo(data[key])
                 break;
             }
@@ -152,7 +152,7 @@ export class Validator {
           case Types.TIME:
             validationResult = setDataValidator.time(data[key])
             break;
-          case Types.GEO:
+          case Types.POSITION:
             validationResult = setDataValidator.geo(data[key])
             break;
         }
