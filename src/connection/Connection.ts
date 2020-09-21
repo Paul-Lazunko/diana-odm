@@ -5,7 +5,7 @@ import { CryptoHelper } from '../helpers';
 import { IClientOptions } from '../options';
 import { ISubscriberHandlerParams } from '../params';
 import { IRequest, IResponse } from '../structures';
-import { Subscriber } from '../subscriber/Subscriber';
+import { Subscriber } from '../subscriber';
 
 export class Connection {
   public isConnected: boolean;
@@ -77,31 +77,35 @@ export class Connection {
   private onData(data: string): void {
     let response: any;
     let dataString: string = data.toString();
+    let dataStringGroup: string[] = [];
     if ( dataString.match('\n') ) {
-      dataString = dataString.replace('\n', '');
+      dataStringGroup = dataString.split('\n');
     }
-    try {
-      const decryptedData: string = this.rawDataString.length ? CryptoHelper.decrypt(this.options.secureKey, this.rawDataString + dataString) : CryptoHelper.decrypt(this.options.secureKey, dataString);
-      response = JSON.parse(decryptedData);
-      const { requestId, action } = response;
-      this.rawDataString = '';
-      if ( action === EServerActions.RESPONSE ) {
-        const hasError: boolean = response.hasOwnProperty('error');
-        if ( hasError ) {
-          this.eventEmitter.emit(`error-${requestId}`, response.error);
-        } else {
-          this.eventEmitter.emit(`response-${requestId}`, response);
+    for (let i=0; i < dataStringGroup.length; i = i + 1) {
+      try {
+        let decryptedData: string = this.rawDataString.length ? CryptoHelper.decrypt(this.options.secureKey, this.rawDataString + dataStringGroup[i]) : CryptoHelper.decrypt(this.options.secureKey, dataStringGroup[i]);
+        response = JSON.parse(decryptedData);
+        const { requestId, action } = response;
+        this.rawDataString = '';
+        if ( action === EServerActions.RESPONSE ) {
+          const hasError: boolean = response.hasOwnProperty('error');
+          if ( hasError ) {
+            this.eventEmitter.emit(`error-${requestId}`, response.error);
+          } else {
+            this.eventEmitter.emit(`response-${requestId}`, response);
+          }
+          clearTimeout(this.timeouts.get(requestId));
+          this.timeouts.delete(requestId);
+        } else if (action === EServerActions.PUBLISH) {
+          if ( this.subscriber instanceof Subscriber) {
+            this.subscriber.process(response.data as ISubscriberHandlerParams);
+          }
         }
-        clearTimeout(this.timeouts.get(requestId));
-        this.timeouts.delete(requestId);
-      } else if (action === EServerActions.PUBLISH) {
-        if ( this.subscriber instanceof Subscriber) {
-          this.subscriber.process(response.data as ISubscriberHandlerParams);
-        }
+      } catch(e) {
+        this.rawDataString += dataStringGroup[i];
       }
-    } catch(e) {
-      this.rawDataString += data.toString();
     }
+
   }
 
   public handleRequest(request: IRequest): Promise<Partial<IResponse>> {
