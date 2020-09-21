@@ -75,7 +75,7 @@ export class Model implements IModel {
   }
 
   protected compareSchemas(schema: ISchema): boolean {
-   return compareSchemas(schema, schema)
+   return compareSchemas(this.options.schema, schema)
   }
 
   protected updateSchema(): Promise<any> {

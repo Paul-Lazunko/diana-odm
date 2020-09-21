@@ -13,7 +13,6 @@ const subCompareSchemas = (schemaA: ISchema, schemaB: ISchema): boolean => {
     for ( const key in schemaA ) {
       if (  key !== '_id' ) {
         if (  !schemaB[key] ) {
-          console.log({key}, schemaA[key], schemaB[key])
           result = true;
           break;
         } else {
@@ -21,6 +20,14 @@ const subCompareSchemas = (schemaA: ISchema, schemaB: ISchema): boolean => {
           for (const property in schemaA[key] ) {
             // @ts-ignore
             if ( property !=='default' && ( !schemaB[key][property] || schemaB[key][property] !== schemaA[key][property] ) ) {
+              // @ts-ignore
+              subResult = true;
+              break;
+            }
+          }
+          for (const property in schemaB[key] ) {
+            // @ts-ignore
+            if ( property !=='default' && ( !schemaA[key][property] || schemaB[key][property] !== schemaA[key][property] ) ) {
               // @ts-ignore
               subResult = true;
               break;
