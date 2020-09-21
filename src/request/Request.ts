@@ -9,7 +9,7 @@ export class Request {
   constructor (requestOptions: Partial<IRequestOptions>) {
     const { connection, ...options} = requestOptions;
     this.options = requestOptions;
-    this.options.requestId = randomStringGenerator(32, true);
+    this.options.requestId = randomStringGenerator(52, true);
   }
 
   public execute(): Promise<any> {
