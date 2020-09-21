@@ -142,7 +142,7 @@ export class Connection {
 
   private write(request: IRequest):void {
     const data = CryptoHelper.encrypt(this.options.secureKey, JSON.stringify(request));
-    this.socket.write(data);
+    this.socket.write(data + '\n');
   }
 
   setSubscriber(subscriber: Subscriber) {
