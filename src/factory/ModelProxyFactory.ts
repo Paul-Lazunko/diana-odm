@@ -21,9 +21,11 @@ export class ModelProxyFactory {
   public static construct(options: IModelOptions) {
     const model = ModelProxyFactory.getModel(options);
     return new Proxy(model, {
-      get(target: any, method: string) {
+      get(target: Model, method: string) {
         if (typeof target[method] === 'function' && ModelProxyFactory.methods.includes(method)) {
           return target[method].bind(model);
+        } else {
+          return undefined;
         }
       },
     }) as IModel;
