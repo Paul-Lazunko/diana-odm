@@ -19,6 +19,7 @@ interface IProjectionValue {
   $year: string,
   $month: string,
   $date: string,
+  $week: string,
   $hours: string,
   $minutes: string,
   $seconds: string,
@@ -51,4 +52,5 @@ export interface ITransformQuery {
   $group?: IGroup,
   $project?: IProjection,
   $replaceRoot?: string
+  $match?: IQuery
 }
