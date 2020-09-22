@@ -1,5 +1,5 @@
-import { IGeo } from './IGeo';
+import { IPoint } from './IPoint';
 
 export interface ISetData {
-  [ key: string ]: string | string[] | number | number [] | boolean | boolean[] | IGeo | IGeo []
+  [ key: string ]: string | string[] | number | number [] | boolean | boolean[] | IPoint | IPoint []
 }

@@ -1,20 +1,20 @@
-import { IGeo } from './IGeo';
+import { IPoint } from './IPoint';
 
 interface ICircleOptions {
-  center: IGeo,
+  center: IPoint,
   radius: number
 }
 
 interface ILinesOptions {
-  lines: IGeo[][],
+  lines: IPoint[][],
   distance: number
 }
 
-export interface IGeoQuery {
+export interface IPointQuery {
   $insideCircle?: ICircleOptions,
   $outsideCircle?: ICircleOptions,
   $nearLines?: ILinesOptions,
   $farFromLines?: ILinesOptions,
-  $insidePolygon?: IGeo[],
-  $outsidePolygon?: IGeo[],
+  $insidePolygon?: IPoint[],
+  $outsidePolygon?: IPoint[],
 }
