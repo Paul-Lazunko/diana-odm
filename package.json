@@ -1,6 +1,6 @@
 {
   "name": "diana-odm",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -18,10 +18,9 @@
     "typescript": "^3.9.2"
   },
   "author": "Paul Lazunko",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "@hapi/joi": "^17.1.0",
-    "esm": "^3.2.25"
+    "@hapi/joi": "^17.1.0"
   },
   "repository": {
     "type": "git",
@@ -31,5 +30,5 @@
     "url": "https://github.com/Paul-Lazunko/diana-odm/issues"
   },
   "homepage": "https://github.com/Paul-Lazunko/diana-odm#readme",
-  "description": ""
+  "description": "ODM for DianaDB"
 }
