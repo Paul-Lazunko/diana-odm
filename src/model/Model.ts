@@ -1,7 +1,7 @@
-import { EClientActions } from '../constants';
+import { EClientActions, Types } from '../constants';
 import { compareSchemas } from '../helpers';
 import { IModelOptions, IRequestOptions } from '../options';
-import { IResponse, ISchema, ISortQuery, IModel, IQuery, ISetData, ITransformQuery } from '../structures';
+import { IModel, IQuery, IResponse, ISchema, ISetData, ISortQuery, ITransformQuery } from '../structures';
 import { Request } from '../request';
 import { Validator } from '../validator';
 
@@ -15,6 +15,9 @@ export class Model implements IModel {
   constructor(options: IModelOptions) {
     this.options = options;
     this.validate = new Validator({ collection: this.options.collection, schema: this.options.schema });
+    this.options.schema._id = {
+      type: Types.OBJECT_ID
+    };
     this.validate.self();
   }
 
