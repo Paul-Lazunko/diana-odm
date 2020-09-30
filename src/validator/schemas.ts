@@ -1,10 +1,13 @@
 import { Types } from '../constants';
-import { ErrorFactory } from "../factory";
 
-const joi = require('@hapi/joi');
+const joi = require('joi');
 
 
 const numberField = joi.number();
+const numberFieldExtended = joi.alternatives(joi.number(), joi.object({
+  $inc: joi.number().positive(),
+  $decr: joi.number().positive()
+}));
 const stringField = joi.string();
 const objectIdField = joi.string().regex(/^[0-9a-fA-F]{36}$/);
 const timeField = joi.string().isoDate();
@@ -221,6 +224,7 @@ export {
   subscriberOptions,
   migrationOptions,
   numberField,
+  numberFieldExtended,
   stringField,
   timeField,
   booleanField,

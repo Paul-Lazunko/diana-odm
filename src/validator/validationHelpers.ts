@@ -1,8 +1,9 @@
-const joi = require('@hapi/joi');
+const joi = require('joi');
 
 import { ErrorFactory } from "../factory";
 import {
   numberField,
+  numberFieldExtended,
   stringField,
   timeField,
   booleanField,
@@ -57,7 +58,7 @@ const setDataValidator: any = {
     return booleanField.validate(data, defaultValidationOptions)
   },
   number(data:any) {
-    return numberField.validate(data, defaultValidationOptions)
+    return numberFieldExtended.validate(data, defaultValidationOptions)
   },
   string(data:any) {
     return stringField.validate(data, defaultValidationOptions)
