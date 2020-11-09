@@ -9,6 +9,8 @@ import { Subscriber } from '../subscriber';
 
 export class Connection {
   public isConnected: boolean;
+  protected subscriber: Subscriber;
+  protected hasResponse: boolean;
   private socket: Socket;
   private eventEmitter: EventEmitter;
   private options: IClientOptions;
@@ -17,22 +19,26 @@ export class Connection {
   private rawDataString: string;
   private reconnectTimeout: any;
   public transactionId: string;
-  protected subscriber: Subscriber;
 
   constructor(options: IClientOptions) {
+    this.hasResponse = false;
     this.options = options;
     this.rawDataString = '';
     this.timeouts = new Map<string, any>();
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.addListener('reconnect', () => {
-      // @ts-ignore
-      if ( this.isStarted && ! this.reconnectTimeout  ) {
-        this.setSocket();
-        this.reconnectTimeout = setTimeout(()=> {
-          clearTimeout(this.reconnectTimeout);
-          this.reconnectTimeout = undefined;
-          this.socket.connect({ host: options.host, port: options.port  });
-        }, options.reconnectInterval)
+      if ( !this.hasResponse ) {
+        console.log(`You can't connect to Evodove Server, please, check provided options`);
+      } else {
+        // @ts-ignore
+        if ( this.isStarted && ! this.reconnectTimeout  ) {
+          this.setSocket();
+          this.reconnectTimeout = setTimeout(()=> {
+            clearTimeout(this.reconnectTimeout);
+            this.reconnectTimeout = undefined;
+            this.socket.connect({ host: options.host, port: options.port  });
+          }, options.reconnectInterval)
+        }
       }
     });
   }
@@ -83,22 +89,25 @@ export class Connection {
     }
     for (let i=0; i < dataStringGroup.length; i = i + 1) {
       try {
-        let decryptedData: string = this.rawDataString.length ? CryptoHelper.decrypt(this.options.secureKey, this.rawDataString + dataStringGroup[i]) : CryptoHelper.decrypt(this.options.secureKey, dataStringGroup[i]);
-        response = JSON.parse(decryptedData);
-        const { requestId, action } = response;
-        this.rawDataString = '';
-        if ( action === EServerActions.RESPONSE ) {
-          const hasError: boolean = response.hasOwnProperty('error');
-          if ( hasError ) {
-            this.eventEmitter.emit(`error-${requestId}`, response.error);
-          } else {
-            this.eventEmitter.emit(`response-${requestId}`, response);
-          }
-          clearTimeout(this.timeouts.get(requestId));
-          this.timeouts.delete(requestId);
-        } else if (action === EServerActions.PUBLISH) {
-          if ( this.subscriber instanceof Subscriber) {
-            this.subscriber.process(response.data as ISubscriberHandlerParams);
+        if ( dataStringGroup[i] ) {
+          let decryptedData: string = this.rawDataString.length ? CryptoHelper.decrypt(this.options.secureKey, this.rawDataString + dataStringGroup[i]) : CryptoHelper.decrypt(this.options.secureKey, dataStringGroup[i]);
+          response = JSON.parse(decryptedData);
+          this.hasResponse = true;
+          const { requestId, action } = response;
+          this.rawDataString = '';
+          if ( action === EServerActions.RESPONSE ) {
+            const hasError: boolean = response.hasOwnProperty('error');
+            if ( hasError ) {
+              this.eventEmitter.emit(`error-${requestId}`, response.error);
+            } else {
+              this.eventEmitter.emit(`response-${requestId}`, response);
+            }
+            clearTimeout(this.timeouts.get(requestId));
+            this.timeouts.delete(requestId);
+          } else if (action === EServerActions.PUBLISH) {
+            if ( this.subscriber instanceof Subscriber) {
+              this.subscriber.process(response.data as ISubscriberHandlerParams);
+            }
           }
         }
       } catch(e) {
@@ -140,7 +149,7 @@ export class Connection {
     })
   }
 
-  private write(request: IRequest):void {
+  private write(request: IRequest): void {
     const data = CryptoHelper.encrypt(this.options.secureKey, JSON.stringify(request));
     this.socket.write(data + '\n');
   }
