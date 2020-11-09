@@ -28,7 +28,7 @@ export class Connection {
     this.eventEmitter = new EventEmitter();
     this.eventEmitter.addListener('reconnect', () => {
       if ( !this.hasResponse ) {
-        console.log(`You can't connect to Evodove Server, please, check provided options`);
+        console.log(`You can't connect to Database, please, check provided options`);
       } else {
         // @ts-ignore
         if ( this.isStarted && ! this.reconnectTimeout  ) {
