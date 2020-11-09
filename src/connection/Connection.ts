@@ -29,16 +29,15 @@ export class Connection {
     this.eventEmitter.addListener('reconnect', () => {
       if ( !this.hasResponse ) {
         console.log(`You can't connect to Database, please, check provided options`);
-      } else {
-        // @ts-ignore
-        if ( this.isStarted && ! this.reconnectTimeout  ) {
-          this.setSocket();
-          this.reconnectTimeout = setTimeout(()=> {
-            clearTimeout(this.reconnectTimeout);
-            this.reconnectTimeout = undefined;
-            this.socket.connect({ host: options.host, port: options.port  });
-          }, options.reconnectInterval)
-        }
+      }
+      // @ts-ignore
+      if ( this.isStarted && ! this.reconnectTimeout  ) {
+        this.setSocket();
+        this.reconnectTimeout = setTimeout(()=> {
+          clearTimeout(this.reconnectTimeout);
+          this.reconnectTimeout = undefined;
+          this.socket.connect({ host: options.host, port: options.port  });
+        }, options.reconnectInterval)
       }
     });
   }
